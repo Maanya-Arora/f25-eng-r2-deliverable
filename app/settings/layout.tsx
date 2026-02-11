@@ -1,8 +1,10 @@
+import * as React from "react";
+import { redirect } from "next/navigation";
+
 import { SidebarNav } from "@/components/global/sidebar-nav";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader1, PageSubHeader1 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
-import { redirect } from "next/navigation";
 
 const sidebarNavItems = [
   {
@@ -20,14 +22,13 @@ interface SettingsLayoutProps {
 }
 
 export default async function SettingsLayout({ children }: SettingsLayoutProps) {
-  // Create supabase server component client and obtain user session from stored cookie
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
+
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
   if (!session) {
-    // this is a protected route - only users who are signed in can view this route
     redirect("/");
   }
 
@@ -37,7 +38,9 @@ export default async function SettingsLayout({ children }: SettingsLayoutProps) 
         <PageHeader1>Settings</PageHeader1>
         <PageSubHeader1>Manage your account and profile settings.</PageSubHeader1>
       </div>
+
       <Separator className="my-6" />
+
       <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
         <aside className="-mx-4 lg:w-1/5">
           <SidebarNav items={sidebarNavItems} />
